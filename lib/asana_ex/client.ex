@@ -4,32 +4,104 @@ defmodule AsanaEx.Client do
   """
   @moduledoc since: "0.0.1"
 
-  @finch_instance AsanaFinch
+  @behaviour AsanaEx.ClientBehaviour
 
   @doc """
   GET details about `me` including all participating workspaces
 
   Returns `{:ok, %Finch.Response{}}`
-
-  Examples:
-    
-    iex> AsanaEx.Client.me()
-    %Finch.Request{method: "GET", scheme: :https, body: nil, host: "app.asana.com", port: 443, path: "/api/1.0/users/me", headers: [], query: nil}
-
   """
-  @spec me(Finch.Request.url()) :: {:ok, %Finch.Response{}}
-  def me(url \\ "https://app.asana.com") do
-    Finch.build(:get, url <> "/api/1.0/users/me")
+  @impl true
+  def me(token) do
+    http_impl().build(:get, token, "users/me")
   end
 
   @doc """
-  Execute HTTP request
-
-  Returns `{:ok, %Finch.Response{}}`
+  Retrieve all tasks by workspace gid
   """
-  @spec execute(Finch.Request.t()) :: {:ok, Finch.Response.t()}
-  def execute(%Finch.Request{} = request) do
-    request
-    |> Finch.request(@finch_instance)
+  @impl true
+  def all_workspace_tasks(_token, _workspace_gis, _my_gid, _offset \\ nil, _tasks \\ [])
+  def all_workspace_tasks(_token, [], _my_gid, _offset, tasks), do: tasks
+
+  def all_workspace_tasks(token, workspace_gids, my_gid, _offset, _tasks)
+      when is_list(workspace_gids) do
+    Task.Supervisor.async_stream(
+      AsanaEx.HttpSupervisor,
+      workspace_gids,
+      __MODULE__,
+      :all_workspace_tasks,
+      [my_gid, token],
+      timeout: 30_000
+    )
   end
+
+  def all_workspace_tasks(token, workspace_gid, assignee_gid, offset, tasks) do
+    params =
+      build_path_with_offset(
+        [workspace: workspace_gid, assignee: assignee_gid, opt_fields: "num_subtasks"],
+        offset
+      )
+
+    path = "tasks?" <> params
+
+    {:ok, response} = http_impl().build(:get, token, path)
+
+    next_page_offset = get_in(response, ["next_page", "offset"])
+
+    cond do
+      is_nil(response["data"]) ->
+        tasks
+
+      not is_nil(next_page_offset) ->
+        tasks = tasks ++ response["data"]
+        all_workspace_tasks(token, workspace_gid, assignee_gid, next_page_offset, tasks)
+
+      true ->
+        tasks ++ response["data"]
+    end
+  end
+
+  @impl true
+  def maybe_get_subtasks(_token, []), do: []
+
+  def maybe_get_subtasks(token, tasks) when is_list(tasks) do
+    tasks
+    |> Stream.filter(fn %{"num_subtasks" => num_subtasks} -> num_subtasks < 1 end)
+    |> Enum.to_list()
+
+    Task.Supervisor.async_stream(
+      AsanaEx.HttpSupervisor,
+      tasks,
+      __MODULE__,
+      :get_subtask,
+      [token],
+      timeout: 30_000
+    )
+  end
+
+  def get_subtask(token, %{"gid" => task_gid}) do
+    _params = build_path_with_offset(opt_fields: "num_subtasks")
+
+    path = "tasks/" <> task_gid <> "/subtasks"
+
+    {:ok, response} = http_impl().build(:get, token, path)
+
+    cond do
+      is_nil(response["data"]) ->
+        []
+
+      true ->
+        response["data"]
+    end
+  end
+
+  defp build_path_with_offset(param_list, offset \\ nil) do
+    if is_nil(offset) do
+      URI.encode_query(param_list)
+    else
+      URI.encode_query(param_list ++ [offset: offset])
+    end
+  end
+
+  defp http_impl, do: Application.get_env(:asana_ex, :client_http, AsanaEx.Client.Http)
 end

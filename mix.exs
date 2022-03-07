@@ -6,6 +6,7 @@ defmodule AsanaEx.MixProject do
       app: :asana_ex,
       version: "0.1.0",
       elixir: "~> 1.12",
+      elixirc_paths: elixirc_paths(Mix.env),
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
@@ -22,9 +23,13 @@ defmodule AsanaEx.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:finch, "~>0.8.1"},
+      {:finch, "~>0.10"},
       {:jason, "~>1.2"},
-      {:bypass, "~>2.1.0", only: :test}
+      {:bypass, "~>2.1.0", only: :test},
+      {:mox, "~>1.0.1", only: :test}
     ]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_),     do: ["lib"]
 end

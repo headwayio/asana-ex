@@ -1,0 +1,59 @@
+ {
+   "data": [
+     {
+       "gid": "1164755603111367",
+       "name": "Writing : Development",
+       "resource_type": "task"
+     },
+     {
+       "gid": "1165774493276937",
+       "name": "Schedule meeting to discuss benchtime",
+       "resource_type": "task"
+     },
+     {
+       "gid": "1183518868223583",
+       "name": "Privacy Policy / Security for Birdseye / TOS / Subscriptions",
+       "resource_type": "task"
+     },
+     {
+       "gid": "1173219669319873",
+       "name": "Birdseye: Launch",
+       "resource_type": "task"
+     },
+     {
+       "gid": "1198902591153447",
+       "name": "Invite LinkedIn Connections to Elixir Event",
+       "resource_type": "task"
+     },
+     {
+       "gid": "1199222422667816",
+       "name": "Figma Training: Create Training Outline",
+       "resource_type": "task"
+     },
+     {
+       "gid": "1199222422667817",
+       "name": "Figma Training: Review Training w/ Team",
+       "resource_type": "task"
+     },
+     {
+       "gid": "1199694515668481",
+       "name": "Encourage candidates to complete assessments",
+       "resource_type": "task"
+     },
+     {
+       "gid": "1199694515668483",
+       "name": "Groom hiring pipeline",
+       "resource_type": "task"
+     },
+     {
+       "gid": "1178105374269254",
+       "name": "Custom Apple TV app?",
+       "resource_type": "task"
+     }
+   ],
+   "next_page": {
+     "offset": "next-offset-for-workspace-1",
+     "path": "/tasks?workspace=11111111111111&assignee=1111111111111111&limit=20&offset=next-offset-for-workspace-1",
+     "uri": "https://app.asana.com/api/1.0/tasks?workspace=11111111111111&assignee=1111111111111111&limit=20&offset=next-offset-for-workspace-1"
+   }
+}

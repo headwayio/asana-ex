@@ -1,0 +1,26 @@
+{
+  "data": [
+     {
+       "gid": "1199519202846301",
+       "name": "Dev as Architect",
+       "resource_type": "task"
+     },
+     {
+       "gid": "1198219089461637",
+       "name": "Verify documentation and capability of current boilerplate(s)",
+       "resource_type": "task"
+     },
+     {
+       "gid": "1186465033679808",
+       "name": "Better Design Systems",
+       "resource_type": "task"
+     },
+     {
+       "gid": "1162434887615522",
+       "name": "Birdseye",
+       "resource_type": "task"
+     }
+   ],
+   "next_page": null
+ }
+

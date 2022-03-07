@@ -7,11 +7,7 @@ defmodule AsanaEx.Application do
 
   @impl true
   def start(_type, _args) do
-    children = [
-      # Starts a worker by calling: AsanaEx.Worker.start_link(arg)
-      # {AsanaEx.Worker, arg}
-      {Finch, name: AsanaFinch}
-    ]
+    children = AsanaEx.API.supervisor_children()
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

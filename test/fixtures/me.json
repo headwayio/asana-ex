@@ -1,0 +1,22 @@
+{
+    "data": {
+        "email": "tester@headway.io",
+        "gid": "1111111111111111",
+        "name": "Test User",
+        "photo": {
+            "image_128x128": "https://s3.amazonaws.com/profile_photos/1162446143815235.1162446143815237.Y51WdBiajhTX9aGTvs0I_128x128.png",
+            "image_21x21": "https://s3.amazonaws.com/profile_photos/1162446143815235.1162446143815237.Y51WdBiajhTX9aGTvs0I_21x21.png",
+            "image_27x27": "https://s3.amazonaws.com/profile_photos/1162446143815235.1162446143815237.Y51WdBiajhTX9aGTvs0I_27x27.png",
+            "image_36x36": "https://s3.amazonaws.com/profile_photos/1162446143815235.1162446143815237.Y51WdBiajhTX9aGTvs0I_36x36.png",
+            "image_60x60": "https://s3.amazonaws.com/profile_photos/1162446143815235.1162446143815237.Y51WdBiajhTX9aGTvs0I_60x60.png"
+        },
+        "resource_type": "user",
+        "workspaces": [
+            {
+                "gid": "1234567891234",
+                "name": "Headway",
+                "resource_type": "workspace"
+            }
+        ]
+    }
+}
