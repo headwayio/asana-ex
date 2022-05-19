@@ -20,10 +20,10 @@ defmodule AsanaEx.Client do
   Retrieve all tasks by workspace gid
   """
   @impl true
-  def all_workspace_tasks(_token, _workspace_gis, _my_gid, _offset \\ nil, _tasks \\ [])
-  def all_workspace_tasks(_token, [], _my_gid, _offset, tasks), do: tasks
+  def all_workspace_tasks(_workspace_gis, _my_gid, _token, _offset \\ nil, _tasks \\ [])
+  def all_workspace_tasks([], _my_gid, _token, _offset, tasks), do: tasks
 
-  def all_workspace_tasks(token, workspace_gids, my_gid, _offset, _tasks)
+  def all_workspace_tasks(workspace_gids, my_gid, token, _offset, _tasks)
       when is_list(workspace_gids) do
     Task.Supervisor.async_stream(
       AsanaEx.HttpSupervisor,
@@ -35,7 +35,7 @@ defmodule AsanaEx.Client do
     )
   end
 
-  def all_workspace_tasks(token, workspace_gid, assignee_gid, offset, tasks) do
+  def all_workspace_tasks(workspace_gid, assignee_gid, token, offset, tasks) do
     params =
       build_path_with_offset(
         [workspace: workspace_gid, assignee: assignee_gid, opt_fields: "num_subtasks"],
@@ -54,7 +54,7 @@ defmodule AsanaEx.Client do
 
       not is_nil(next_page_offset) ->
         tasks = tasks ++ response["data"]
-        all_workspace_tasks(token, workspace_gid, assignee_gid, next_page_offset, tasks)
+        all_workspace_tasks(workspace_gid, assignee_gid, token, next_page_offset, tasks)
 
       true ->
         tasks ++ response["data"]
@@ -62,13 +62,9 @@ defmodule AsanaEx.Client do
   end
 
   @impl true
-  def maybe_get_subtasks(_token, []), do: []
+  def maybe_get_subtasks([], _token), do: []
 
-  def maybe_get_subtasks(token, tasks) when is_list(tasks) do
-    tasks
-    |> Stream.filter(fn %{"num_subtasks" => num_subtasks} -> num_subtasks < 1 end)
-    |> Enum.to_list()
-
+  def maybe_get_subtasks(tasks, token) when is_list(tasks) do
     Task.Supervisor.async_stream(
       AsanaEx.HttpSupervisor,
       tasks,
@@ -79,19 +75,17 @@ defmodule AsanaEx.Client do
     )
   end
 
-  def get_subtask(token, %{"gid" => task_gid}) do
+  def get_subtask(%{"gid" => task_gid}, token) do
     _params = build_path_with_offset(opt_fields: "num_subtasks")
 
     path = "tasks/" <> task_gid <> "/subtasks"
 
     {:ok, response} = http_impl().build(:get, token, path)
 
-    cond do
-      is_nil(response["data"]) ->
-        []
-
-      true ->
-        response["data"]
+    if is_nil(response["data"]) do
+      []
+    else
+      response["data"]
     end
   end
 

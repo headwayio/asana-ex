@@ -1,4 +1,8 @@
 defmodule AsanaEx.RequestHelpers do
+  @moduledoc """
+  Test helpers
+  """
+
   @type path :: binary()
   @type method :: Finch.Request.method()
   @type gid :: binary()
@@ -15,17 +19,13 @@ defmodule AsanaEx.RequestHelpers do
   end
 
   def bypass_expect(bypass) do
-    Bypass.expect(bypass, fn conn ->
+    Bypass.expect(bypass, fn _conn ->
       "{}"
     end)
   end
 
   def bypass_expect(bypass, method, path, filenames) do
     {:ok, agent} = Agent.start_link(fn -> filenames end)
-
-    # require IEx; IEx.pry
-
-    # IEx.Helpers.break!(Bypass.Plug.call/2)
 
     Bypass.expect(bypass, method, path, fn conn ->
       filenames = Agent.get(agent, fn content -> content end)

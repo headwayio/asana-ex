@@ -1,4 +1,8 @@
 defmodule AsanaEx.Client.Http do
+  @moduledoc """
+  HTTP responsibilities
+  """
+
   @behaviour AsanaEx.Client.HttpBehaviour
 
   alias AsanaEx.Client.Response
@@ -26,7 +30,6 @@ defmodule AsanaEx.Client.Http do
 
   defp endpoint(path), do: AsanaEx.Client.Host.connect_url() <> path
 
-  defp base_headers(token), do: [{"content-type", "application/json"}, {"Authorization", "Bearer " <> token}]
-
-  defp impl, do: Application.get_env(:asana_ex, :client_http, __MODULE__)
+  defp base_headers(token),
+    do: [{"content-type", "application/json"}, {"Authorization", "Bearer " <> token}]
 end

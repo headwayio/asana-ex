@@ -11,4 +11,5 @@ defmodule AsanaEx.Types do
   @type headers :: Finch.Request.headers()
   @type request_opts :: Keyword.t()
   @type decode_error :: Jason.decode_error()
+  @type response :: {:ok, term()} | {:error, Jason.DecodeError.t()}
 end

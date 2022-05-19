@@ -1,6 +1,4 @@
 defmodule AsanaEx.API do
-  @pool_name __MODULE__
-
   alias AsanaEx.Config
 
   def supervisor_children do

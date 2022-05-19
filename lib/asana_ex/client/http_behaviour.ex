@@ -8,10 +8,7 @@ defmodule AsanaEx.Client.HttpBehaviour do
   @type response :: AsanaEx.Types.response
   @type request_opts :: AsanaEx.Types.request_opts
 
-  @callback build(method(), token(), path()) :: request()
-  @callback build(method(), token(), path(), headers()) :: request()
-  @callback build(method(), token(), path(), headers(), body()) :: request()
-  @callback build(method(), token(), path(), headers(), body(), request_opts()) :: request()
+  @callback build(method(), token(), path(), headers(), body(), request_opts()) :: response()
   @callback execute(request()) :: {:ok, response()}
 end
 
