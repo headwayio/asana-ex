@@ -1,10 +1,10 @@
- {
-   "data": [
-     {
-       "gid": "67890",
-       "name": "Writing : Development - Part 2",
-       "resource_type": "task",
-       "num_subtasks": 0
-     }
-   ]
+{
+  "data": [
+    {
+      "gid": "78900",
+      "name": "Writing : Development - Part 2",
+      "resource_type": "task",
+      "num_subtasks": 0
+    }
+  ]
 }
