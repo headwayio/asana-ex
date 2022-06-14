@@ -1,5 +1,7 @@
 defmodule AsanaEx.API do
-  alias AsanaEx.Config
+  @moduledoc """
+  AsanaEx.API module
+  """
 
   def supervisor_children do
     [
@@ -10,6 +12,6 @@ defmodule AsanaEx.API do
 
   @spec get_pools() :: Keyword.t()
   defp get_pools() do
-    Config.resolve(:pool_options, default: [size: 10])
+    Application.get_env(:asana_ex, :pool_options, default: [size: 10])
   end
 end

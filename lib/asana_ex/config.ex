@@ -3,33 +3,20 @@ defmodule AsanaEx.Config do
   Utility that handles interaction with the application's configuration
   """
 
-  @doc """
-  Resolves the given key from the application's configuration returning the
-  wrapped expanded value. If the value was a function it gets evaluated, if
-  the value is a tuple of three elements it gets applied.
-  """
-  @spec resolve(atom, any) :: any
-  def resolve(key, default \\ nil)
+  @oauth_key_name :_asana_ex_oauth
 
-  def resolve(key, default) when is_atom(key) do
-    Application.get_env(:asana_ex, key, default)
-    |> expand_value()
+  @spec get(:global | :process) :: any | nil
+  def get(_scope \\ :process)
+  def get(:global), do: Application.get_env(:asana_ex, :oauth, nil)
+  def get(:process), do: Process.get(@oauth_key_name, nil)
+
+  @spec set(any()) :: :ok
+  @spec set(:process | :global, any()) :: :ok
+  def set(value), do: set(:process, value)
+  def set(:global, value), do: Application.put_env(:asana_ex, :oauth, value)
+
+  def set(:process, value) do
+    Process.put(@oauth_key_name, value)
+    :ok
   end
-
-  def resolve(key, _) do
-    raise(
-      ArgumentError,
-      message: "#{__MODULE__} expected key '#{key}' to be an atom"
-    )
-  end
-
-  defp expand_value({module, function, args}) when is_atom(function) and is_list(args) do
-    apply(module, function, args)
-  end
-
-  defp expand_value(value) when is_function(value) do
-    value.()
-  end
-
-  defp expand_value(value), do: value
 end
