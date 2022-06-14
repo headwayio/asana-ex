@@ -1,4 +1,8 @@
 defmodule AsanaEx.ClientBehaviour do
+  @moduledoc """
+  AsanaEx.ClientBehaviour module
+  """
+
   @type gid :: AsanaEx.Types.gid()
   @type token :: binary()
   @type offset :: AsanaEx.Types.offset()
@@ -8,5 +12,5 @@ defmodule AsanaEx.ClientBehaviour do
   @callback me(token()) :: {:ok, response()}
   @callback all_workspace_tasks(token(), list(gid()) | gid(), gid(), offset() | nil, list(task())) ::
               list(task())
-  @callback maybe_get_subtasks(token(), list(task())) :: list(task())
+  @callback maybe_get_subtasks(list(task()), token()) :: list(task())
 end

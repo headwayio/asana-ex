@@ -24,9 +24,7 @@ defmodule AsanaEx.Client.Http do
   Returns `{:ok, %Finch.Response{}}`
   """
   @impl true
-  def execute(request) do
-    Finch.request(request, @finch_instance)
-  end
+  def execute(request), do: Finch.request(request, @finch_instance)
 
   defp endpoint(path), do: AsanaEx.Client.Host.connect_url() <> path
 
