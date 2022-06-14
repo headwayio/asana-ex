@@ -37,7 +37,7 @@ defmodule AsanaEx.Client do
 
   def all_workspace_tasks(workspace_gid, assignee_gid, token, offset, tasks) do
     params =
-      build_path_with_offset(
+      query_params_with_optional_offset(
         [workspace: workspace_gid, assignee: assignee_gid, opt_fields: "num_subtasks"],
         offset
       )
@@ -75,10 +75,10 @@ defmodule AsanaEx.Client do
     )
   end
 
-  def get_subtask(%{"gid" => task_gid}, token) do
-    _params = build_path_with_offset(opt_fields: "num_subtasks")
-
-    path = "tasks/" <> task_gid <> "/subtasks"
+  def get_subtask([gid: task_gid, num_subtasks: _num_subtasks], token) do
+    path =
+      "tasks/" <>
+        task_gid <> "/subtasks?" <> query_params_with_optional_offset(opt_fields: "num_subtasks")
 
     {:ok, response} = http_impl().build(:get, token, path)
 
@@ -89,7 +89,7 @@ defmodule AsanaEx.Client do
     end
   end
 
-  defp build_path_with_offset(param_list, offset \\ nil) do
+  defp query_params_with_optional_offset(param_list, offset \\ nil) do
     if is_nil(offset) do
       URI.encode_query(param_list)
     else

@@ -14,9 +14,9 @@ defmodule AsanaEx.ClientTest do
   setup :verify_on_exit!
 
   test "builds and requests Asana request for @me endpoint" do
-    expect(MockHttp, :build, 1, fn _method, _path -> {:ok, fixture("me.json")} end)
+    expect(MockHttp, :build, 1, fn _method, _token, _path -> {:ok, fixture("me.json")} end)
 
-    response = AsanaEx.Client.me()
+    response = AsanaEx.Client.me("mytoken")
 
     assert {:ok, %{"data" => %{"email" => "tester@headway.io"}}} = response
   end
@@ -25,17 +25,17 @@ defmodule AsanaEx.ClientTest do
     parent = self()
     ref = make_ref()
 
-    expect(MockHttp, :build, 1, fn :get, _path ->
+    expect(MockHttp, :build, 1, fn :get, _token, _path ->
       send(parent, {ref, :three})
       {:ok, fixture("workspace2.json")}
     end)
 
-    expect(MockHttp, :build, 1, fn :get, _path ->
+    expect(MockHttp, :build, 1, fn :get, _token, _path ->
       send(parent, {ref, :one})
       {:ok, fixture("workspace1.json")}
     end)
 
-    expect(MockHttp, :build, 1, fn :get, _path ->
+    expect(MockHttp, :build, 1, fn :get, _token, _path ->
       send(parent, {ref, :two})
       {:ok, fixture("workspace1b.json")}
     end)
@@ -43,7 +43,7 @@ defmodule AsanaEx.ClientTest do
     workspace_gids = ["12345", "67890"]
 
     tasks =
-      AsanaEx.Client.all_workspace_tasks(workspace_gids, "12345")
+      AsanaEx.Client.all_workspace_tasks(workspace_gids, "12345", "mytoken")
       |> Enum.to_list()
       |> Enum.flat_map(fn {_, items} -> items end)
 
@@ -51,35 +51,37 @@ defmodule AsanaEx.ClientTest do
     assert_receive {^ref, :two}
     assert_receive {^ref, :three}
 
-    assert 15 = Enum.count(tasks)
+    assert 15 == Enum.count(tasks)
   end
 
   test "recursively retrieves subtasks for a collection of tasks" do
     parent = self()
     ref = make_ref()
 
-    expect(MockHttp, :build, 1, fn :get, _path ->
+    expect(MockHttp, :build, 1, fn :get, _token, _path ->
       send(parent, {ref, :one})
       {:ok, fixture("task1.json")}
     end)
 
-    expect(MockHttp, :build, 1, fn :get, _path ->
+    expect(MockHttp, :build, 1, fn :get, _token, _path ->
       send(parent, {ref, :two})
       {:ok, fixture("task1_subtask1.json")}
     end)
 
-    expect(MockHttp, :build, 1, fn :get, _path ->
-      send(parent, {ref, :three})
-      {:ok, fixture("task1_subtask2.json")}
-    end)
-
     tasks =
-      AsanaEx.Client.maybe_get_subtasks([[gid: "12345", num_subtasks: 0], [gid: "67890", num_subtasks: 2]])
+      AsanaEx.Client.maybe_get_subtasks(
+        [
+          [gid: "12345", num_subtasks: 0],
+          [gid: "67890", num_subtasks: 2]
+        ],
+        "mytoken"
+      )
       |> Enum.to_list()
       |> Enum.flat_map(fn {_, items} -> items end)
 
     assert_receive {^ref, :one}
     assert_receive {^ref, :two}
-    assert_receive {^ref, :three}
+
+    assert 2 == Enum.count(tasks)
   end
 end
