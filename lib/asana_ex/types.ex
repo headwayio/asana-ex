@@ -13,4 +13,6 @@ defmodule AsanaEx.Types do
   @type request_opts :: Keyword.t()
   @type decode_error :: Jason.decode_error()
   @type exception :: Exception.t()
+  @type fields :: String.t()
+  @type limit :: pos_integer()
 end

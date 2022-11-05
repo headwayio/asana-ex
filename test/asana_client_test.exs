@@ -13,7 +13,7 @@ defmodule AsanaEx.ClientTest do
   setup :set_mox_from_context
   setup :verify_on_exit!
 
-  test "builds and requests Asana request for @me endpoint" do
+  test "builds and sends Asana request for @me endpoint" do
     expect(MockHttp, :build, 1, fn _method, _token, _path -> {:ok, fixture("me.json")} end)
 
     response = AsanaEx.Client.me("mytoken")
@@ -21,7 +21,7 @@ defmodule AsanaEx.ClientTest do
     assert {:ok, %{"data" => %{"email" => "tester@headway.io"}}} = response
   end
 
-  test "builds and requests Asana request for workspace tasks" do
+  test "builds and sends Asana requests for workspace tasks" do
     parent = self()
     ref = make_ref()
 
@@ -71,9 +71,10 @@ defmodule AsanaEx.ClientTest do
     tasks =
       AsanaEx.Client.maybe_get_subtasks(
         [
-          [gid: "12345", num_subtasks: 0],
-          [gid: "67890", num_subtasks: 2]
+          %{"gid" => "12345", "num_subtasks" => 0},
+          %{"gid" => "67890", "num_subtasks" => 2}
         ],
+        "assignee-gid-value",
         "mytoken"
       )
       |> Enum.to_list()
