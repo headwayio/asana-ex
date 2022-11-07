@@ -1,0 +1,24 @@
+ {
+   "data": [
+     {
+       "gid": "2264755603111367",
+       "name": "Development Team Project",
+       "resource_type": "project"
+     },
+     {
+       "gid": "2274755603111367",
+       "name": "Product Team Project",
+       "resource_type": "project"
+     },
+     {
+       "gid": "2235774493276937",
+       "name": "Design Team Project",
+       "resource_type": "project"
+     }
+   ],
+   "next_page": {
+     "offset": "next-offset-for-project-1",
+     "path": "/projects?workspace=11111111111111&assignee=1111111111111111&limit=20&offset=next-offset-for-project-1",
+     "uri": "https://app.asana.com/api/1.0/projects?workspace=11111111111111&assignee=1111111111111111&limit=20&offset=next-offset-for-project-1"
+   }
+}

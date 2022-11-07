@@ -79,6 +79,69 @@ defmodule AsanaEx.Client do
     end
   end
 
+  @doc """
+  Retrieve all projects by workspace gid
+  """
+  @impl true
+  def all_workspace_projects(
+        _workspace_gis,
+        _assignee_gid,
+        _token,
+        _fields \\ "name,notes",
+        _limit \\ 100,
+        _offset \\ nil,
+        _projects \\ []
+      )
+
+  def all_workspace_projects([], _assignee_gid, _token, _fields, _limit, _offset, projects), do: projects
+
+  def all_workspace_projects(workspace_gids, assignee_gid, token, fields, limit, _offset, _projects)
+      when is_list(workspace_gids) do
+    Task.Supervisor.async_stream(
+      AsanaEx.HttpSupervisor,
+      workspace_gids,
+      __MODULE__,
+      :all_workspace_projects,
+      [assignee_gid, token, fields, limit],
+      timeout: 30_000
+    )
+  end
+
+  def all_workspace_projects(workspace_gid, assignee_gid, token, fields, limit, offset, projects) do
+    params =
+      query_params_with_optional_offset(
+        [workspace: workspace_gid, assignee: assignee_gid, opt_fields: fields, limit: limit],
+        offset
+      )
+
+    path = "projects?" <> params
+
+    {:ok, response} = http_impl().build(:get, token, path)
+
+    next_page_offset = get_in(response, ["next_page", "offset"])
+
+    cond do
+      is_nil(response["data"]) ->
+        projects
+
+      not is_nil(next_page_offset) ->
+        projects = projects ++ response["data"]
+
+        all_workspace_tasks(
+          workspace_gid,
+          assignee_gid,
+          fields,
+          limit,
+          token,
+          next_page_offset,
+          projects
+        )
+
+      true ->
+        projects ++ response["data"]
+    end
+  end
+
   @impl true
   def maybe_get_subtasks(_tasks, _assigneed_gid, _token, _fields \\ nil, _limit \\ 100)
   def maybe_get_subtasks([], _assigneed_gid, _token, _fields, _limit), do: []
