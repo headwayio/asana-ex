@@ -1,0 +1,14 @@
+ {
+   "data": [
+     {
+       "gid": "3264755603111367",
+       "name": "Marketing Team Project",
+       "resource_type": "project"
+     },
+     {
+       "gid": "3335774493276937",
+       "name": "Leadership Team Project",
+       "resource_type": "project"
+     }
+   ]
+}

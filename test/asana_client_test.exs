@@ -54,6 +54,33 @@ defmodule AsanaEx.ClientTest do
     assert 15 == Enum.count(tasks)
   end
 
+  test "builds and sends Asana requests for projects" do
+    parent = self()
+    ref = make_ref()
+
+    expect(MockHttp, :build, 1, fn :get, _token, _path ->
+      send(parent, {ref, :two})
+      {:ok, fixture("project2.json")}
+    end)
+
+    expect(MockHttp, :build, 1, fn :get, _token, _path ->
+      send(parent, {ref, :one})
+      {:ok, fixture("project1.json")}
+    end)
+
+    workspace_gids = ["12345", "67890"]
+
+    projects =
+      AsanaEx.Client.all_workspace_projects(workspace_gids, "12345", "mytoken")
+      |> Enum.to_list()
+      |> Enum.flat_map(fn {_, items} -> items end)
+
+    assert_receive {^ref, :one}
+    assert_receive {^ref, :two}
+
+    assert 5 == Enum.count(projects)
+  end
+
   test "recursively retrieves subtasks for a collection of tasks" do
     parent = self()
     ref = make_ref()
